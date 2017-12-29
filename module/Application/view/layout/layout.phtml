@@ -1,0 +1,39 @@
+<?php /* @var \Zend\View\Renderer\PhpRenderer $this */ ?>
+<?php
+$this->headTitle()->setSeparator(' - ')->setAutoEscape(false);
+$this->headTitle('CDC - Compact Disc Center, Freiburg');
+$this->headMeta()->setCharset('UTF-8');
+$this->headMeta()->appendHttpEquiv('X-UA-Compatible', 'IE=edge');
+$this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1.0');
+$this->headLink(['rel' => 'shortcut icon', 'href' => '/images/favicon.ico']);
+$this->headLink()->appendStylesheet('/styles/layout.css');
+$this->headLink()->appendStylesheet('/styles/button.css');
+$this->headLink()->appendStylesheet('/styles/table.css');
+$this->headLink()->appendStylesheet('/styles/tree.css');
+$this->headLink()->appendStylesheet('/styles/form.css');
+$this->headLink()->appendStylesheet('/styles/dialog.css');
+$this->headLink()->appendStylesheet('/styles/headings.css');
+$this->headLink()->appendStylesheet('/styles/navigation.css');
+$this->headLink()->appendStylesheet('/styles/specific/filtering.css');
+$this->headScript()->appendFile('/scripts/moment.js', 'text/javascript');
+$this->headScript()->appendFile('/scripts/jquery.js', 'text/javascript');
+$this->headScript()->appendFile('/scripts/jpv-common.js', 'text/javascript');
+$this->headScript()->appendFile('/scripts/jpv-data-binding.js', 'text/javascript');
+$this->headScript()->appendFile('/scripts/jpv-ui.js', 'text/javascript');
+$this->headScript()->appendFile('/scripts/application.js', 'text/javascript');
+
+?>
+<?= $this->doctype() . "\n"; ?>
+<html lang="en">
+	<head>
+	    <?= $this->headTitle() . "\n"; ?>
+	    <?= $this->headMeta() . "\n"; ?>
+	    <?= $this->headLink() . "\n"; ?>
+	    <?= $this->headScript() . "\n"; ?>
+	    <?= $this->headStyle() . "\n"; ?>
+	</head>
+	<body class="clearfix">
+		<?= $this->content; ?>
+		<?= $this->inlineScript(); ?>
+	</body>
+</html>

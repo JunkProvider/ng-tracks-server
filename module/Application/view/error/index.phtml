@@ -1,0 +1,21 @@
+<?php $this->headTitle('application_title_error_index'); ?>
+<br/><br/>
+<div class="container">
+    <div class="row">
+        <div class="span12">
+            <div class="hero-unit center">
+                <h1><?= $this->translate('application_title_error_index'); ?></h1>
+                <br/>
+                <p></p>
+                <p class="pull-center">
+                    <a href="/" class="btn btn-success">
+                        <?php echo $this->translate('application_action_homepage'); ?>
+                    </a>
+                </p>
+            </div>
+            <div>
+            	<?= $this->exception; ?>
+            </div>
+        </div>
+    </div>
+</div>
