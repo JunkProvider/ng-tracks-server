@@ -4,6 +4,7 @@ namespace Application\Model;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class TrackRepository
 {
@@ -70,7 +71,7 @@ class TrackRepository
 	 * 
 	 * @return Track[]
 	 */
-	public function getBySearchTextAndFilters($searchText, array $filters, $orderBy = [ 'title' => 'asc' ])
+	public function getBySearchTextAndFilters($searchText, array $filters, $orderBy = [ 'title' => 'asc' ], $offset = 0, $limit = null)
 	{
 		$qb = $this->createQueryBuilder('t');
 		$expr = $qb->expr();
@@ -82,8 +83,21 @@ class TrackRepository
 		foreach ($orderBy as $prop => $direction) {
 			$qb->addOrderBy('t.' . $prop, $direction);
 		}
-
-		return $qb->getQuery()->setMaxResults(1000)->getResult();
+		
+		$query = $qb->getQuery();
+		
+		$paginator = new Paginator($query, $fetchJoinCollection = true);
+		$totalCount = $paginator->count();
+		
+		if ($offset !== null && $offset > 0) {
+			$query->setFirstResult($offset);
+		}
+		
+		if ($limit !== null) {
+			$query->setMaxResults($limit);
+		}
+		
+		return new PagedQueryResult($query->getResult(), $totalCount);
 	}
 	
 	/**

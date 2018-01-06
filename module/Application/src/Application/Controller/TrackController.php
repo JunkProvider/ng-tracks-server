@@ -62,7 +62,12 @@ class TrackController extends AbstractController
 				}
 			}
 			
-			return $this->jsonResponse($this->getTrackRepository()->getBySearchTextAndFilters('', $filters));
+			$offset = (int)$this->params()->fromQuery('offset', 0);
+			$limit = (int)$this->params()->fromQuery('limit', 1000);
+			
+			$result = $this->getTrackRepository()->getBySearchTextAndFilters('', $filters, [ 'title' => 'asc' ], $offset, $limit);
+			
+			return $this->jsonResponse($result);
 		} catch (\Exception $e) {
 			return $this->jsonResponseFromException($e);
 		}
