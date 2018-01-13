@@ -8,6 +8,30 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class TrackRepository
 {
+	private static function mapSortCriterion($sortCriterion)
+	{
+		switch (strtoupper($sortCriterion)) {
+			case 'TITLE':
+				return 'title';
+			case 'RATING':
+				return 'rating';
+			default:
+				throw new \InvalidArgumentException('Unknown sort criterion "' . $sortCriterion . '".');
+		}
+	}
+	
+	private static function mapSortDirection($sortDirection)
+	{
+		switch (strtoupper($sortDirection)) {
+			case 'ASC':
+				return 'asc';
+			case 'DESC':
+				return 'desc';
+			default:
+				throw new \InvalidArgumentException('Unknown sort direction "' . $sortDirection . '".');
+		}
+	}
+	
 	/**
 	 * @var EntityManager
 	 */
@@ -71,13 +95,13 @@ class TrackRepository
 	 * 
 	 * @return Track[]
 	 */
-	public function getBySearchTextAndFilters($searchText, array $filters, $orderBy = [ 'title' => 'asc' ], $offset = 0, $limit = null)
+	public function getBySearchTextAndFilters($searchText, array $filters, $sortCriterion = 'TITLE', $sortDirection = 'ASC', $offset = 0, $limit = null)
 	{
-		$qb = $this->createQueryBuilder('t');
+		$qb = $this->createQueryBuilder('track');
 		$expr = $qb->expr();
 		
 		if ($searchText) {
-			$qb->andWhere($expr->like('t.title', '\'%' . $searchText . '%\''));
+			$qb->andWhere($expr->like('track.title', '\'%' . $searchText . '%\''));
 			/*$qb->join('t.interprets', 'interpret');
 			$qb->andWhere(
 				$expr->orX(
@@ -91,9 +115,7 @@ class TrackRepository
 			$filter->apply($qb);
 		}
 		
-		foreach ($orderBy as $prop => $direction) {
-			$qb->addOrderBy('t.' . $prop, $direction);
-		}
+		$qb->orderBy('track.' . TrackRepository::mapSortCriterion($sortCriterion), TrackRepository::mapSortDirection($sortDirection));
 		
 		$query = $qb->getQuery();
 		

@@ -63,10 +63,12 @@ class TrackController extends AbstractController
 			}
 			
 			$search = $this->params()->fromQuery('search', '');
+			$sortCriterion = $this->params()->fromQuery('sortCriterion', 'TITLE');
+			$sortDirection = $this->params()->fromQuery('sortDirection', 'ASC');
 			$offset = (int)$this->params()->fromQuery('offset', 0);
 			$limit = (int)$this->params()->fromQuery('limit', 1000);
 			
-			$result = $this->getTrackRepository()->getBySearchTextAndFilters($search, $filters, [ 'title' => 'asc' ], $offset, $limit);
+			$result = $this->getTrackRepository()->getBySearchTextAndFilters($search, $filters, $sortCriterion, $sortDirection, $offset, $limit);
 			
 			return $this->jsonResponse($result);
 		} catch (\Exception $e) {
