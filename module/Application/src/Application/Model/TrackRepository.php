@@ -75,6 +75,17 @@ class TrackRepository
 	{
 		$qb = $this->createQueryBuilder('t');
 		$expr = $qb->expr();
+		
+		if ($searchText) {
+			$qb->andWhere($expr->like('t.title', '\'%' . $searchText . '%\''));
+			/*$qb->join('t.interprets', 'interpret');
+			$qb->andWhere(
+				$expr->orX(
+					$expr->like('t.title', '\'%' . $searchText . '%\''),
+					$expr->like('interpret.name', '\'%' . $searchText . '%\'')
+				)	
+			);*/
+		}
 	
 		foreach ($filters as $filter) {
 			$filter->apply($qb);
