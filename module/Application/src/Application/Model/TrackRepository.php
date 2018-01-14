@@ -95,7 +95,7 @@ class TrackRepository
 	 * 
 	 * @return Track[]
 	 */
-	public function getBySearchTextAndFilters($searchText, array $filters, $sortCriterion = 'TITLE', $sortDirection = 'ASC', $offset = 0, $limit = null)
+	public function getBySearchTextAndFilters($searchText, array $filters, FilterInterface $sorting, $offset = 0, $limit = null)
 	{
 		$qb = $this->createQueryBuilder('track');
 		$expr = $qb->expr();
@@ -114,7 +114,9 @@ class TrackRepository
 			$filter->apply($qb);
 		}
 		
-		$qb->orderBy('track.' . TrackRepository::mapSortCriterion($sortCriterion), TrackRepository::mapSortDirection($sortDirection));
+		$sorting->apply($qb);
+		
+		$qb->distinct(true);
 		
 		$query = $qb->getQuery();
 		

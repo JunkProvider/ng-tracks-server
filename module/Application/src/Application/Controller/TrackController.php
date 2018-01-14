@@ -10,14 +10,15 @@ use Application\Model\Genre;
 use Application\Model\GenreRepository;
 use Application\Model\LinkRepository;
 use Application\Model\Link;
-use Application\Model\TrackFilter\GenresFilter;
 use Application\Model\TrackFilter\NumberFilter;
-use Application\Model\TagRepository;
 use Application\Model\Tag;
 use Application\Model\TagTypeRepository;
 use Application\Model\TagType;
 use Application\Model\TrackFilter\TagsFilter;
 use Application\Model\TrackFilter\JoinedEntityTextFilter;
+use Application\Model\TrackSort\TitleSort;
+use Application\Model\TrackSort\RatingSort;
+use Application\Model\TrackSort\InterpretSort;
 
 class TrackController extends AbstractController
 {
@@ -65,10 +66,24 @@ class TrackController extends AbstractController
 			$search = $this->params()->fromQuery('search', '');
 			$sortCriterion = $this->params()->fromQuery('sortCriterion', 'TITLE');
 			$sortDirection = $this->params()->fromQuery('sortDirection', 'ASC');
+			
+			$sorting = null;
+			switch ($sortCriterion) {
+				case 'TITLE':
+					$sorting = new TitleSort($sortDirection);
+					break;
+				case 'RATING':
+					$sorting = new RatingSort($sortDirection);
+					break;
+				case 'INTERPRET':
+					$sorting = new InterpretSort($sortDirection);
+					break;
+			}
+			
 			$offset = (int)$this->params()->fromQuery('offset', 0);
 			$limit = (int)$this->params()->fromQuery('limit', 1000);
 			
-			$result = $this->getTrackRepository()->getBySearchTextAndFilters($search, $filters, $sortCriterion, $sortDirection, $offset, $limit);
+			$result = $this->getTrackRepository()->getBySearchTextAndFilters($search, $filters, $sorting, $offset, $limit);
 			
 			return $this->jsonResponse($result);
 		} catch (\Exception $e) {
