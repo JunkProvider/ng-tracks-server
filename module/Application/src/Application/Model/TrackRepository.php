@@ -102,10 +102,15 @@ class TrackRepository
 		
 		if ($searchText) {
 			$qb->join('track.interprets', 'interpret');
+			$qb->join('track.genres', 'genre');
+			$qb->join('track.tags', 'tag');
+			$qb->join('tag.type', 'tagType');
 			$qb->andWhere(
 				$expr->orX(
 					$expr->like('track.title', '\'%' . $searchText . '%\''),
-					$expr->like('interpret.name', '\'%' . $searchText . '%\'')
+					$expr->like('interpret.name', '\'%' . $searchText . '%\''),
+					$expr->like('genre.name', '\'%' . $searchText . '%\''),
+					$expr->like('tagType.name', '\'%' . $searchText . '%\'')
 				)	
 			);
 		}
