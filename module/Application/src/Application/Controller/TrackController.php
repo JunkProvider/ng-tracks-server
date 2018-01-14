@@ -68,7 +68,7 @@ class TrackController extends AbstractController
 			$sortDirection = $this->params()->fromQuery('sortDirection', 'ASC');
 			
 			$sorting = null;
-			switch ($sortCriterion) {
+			switch (strtoupper($sortCriterion)) {
 				case 'TITLE':
 					$sorting = new TitleSort($sortDirection);
 					break;
