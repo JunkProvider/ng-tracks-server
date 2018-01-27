@@ -1,10 +1,10 @@
 <?php
 namespace Application\Model\TrackSort;
 
-use Application\Model\FilterInterface;
+use Application\Model\QueryEffectInterface;
 use Application\Model\QueryBuilder;
 
-class RatingSort implements FilterInterface
+class RatingSort implements QueryEffectInterface
 {
 
 	/**

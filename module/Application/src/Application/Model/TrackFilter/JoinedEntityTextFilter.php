@@ -1,10 +1,10 @@
 <?php
 namespace Application\Model\TrackFilter;
 
-use Application\Model\FilterInterface;
+use Application\Model\QueryEffectInterface;
 use Application\Model\QueryBuilder;
 
-class JoinedEntityTextFilter implements FilterInterface
+class JoinedEntityTextFilter implements QueryEffectInterface
 {
 
 	/**

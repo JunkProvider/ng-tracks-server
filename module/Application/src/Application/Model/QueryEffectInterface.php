@@ -1,7 +1,7 @@
 <?php
 namespace Application\Model;
 
-interface FilterInterface
+interface QueryEffectInterface
 {
 
 	public function apply(QueryBuilder $qb);

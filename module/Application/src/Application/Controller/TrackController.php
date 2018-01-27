@@ -19,6 +19,7 @@ use Application\Model\TrackFilter\JoinedEntityTextFilter;
 use Application\Model\TrackSort\TitleSort;
 use Application\Model\TrackSort\RatingSort;
 use Application\Model\TrackSort\InterpretSort;
+use Application\Model\TrackFilter\SearchFilter;
 
 class TrackController extends AbstractController
 {
@@ -67,6 +68,10 @@ class TrackController extends AbstractController
 			$sortCriterion = $this->params()->fromQuery('sortCriterion', 'TITLE');
 			$sortDirection = $this->params()->fromQuery('sortDirection', 'ASC');
 			
+			if ($search !== null && $search !== '') {
+				$filters[] = new SearchFilter($search);
+			}
+			
 			$sorting = null;
 			switch (strtoupper($sortCriterion)) {
 				case 'TITLE':
@@ -83,7 +88,7 @@ class TrackController extends AbstractController
 			$pageIndex = (int)$this->params()->fromQuery('pageIndex', 0);
 			$pageSize = (int)$this->params()->fromQuery('pageSize', 100);
 			
-			$result = $this->getTrackRepository()->getFiltered($search, $filters, $sorting, $pageIndex, $pageSize);
+			$result = $this->getTrackRepository()->getFiltered($filters, $sorting, $pageIndex, $pageSize);
 			
 			/* @var Track $track */
 			/*$track = $result->getItems()[2];

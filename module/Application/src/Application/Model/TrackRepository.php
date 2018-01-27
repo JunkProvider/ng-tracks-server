@@ -94,17 +94,16 @@ class TrackRepository
 	}
 
 	/**
-	 * @param string            $searchText
-	 * @param FilterInterface[] $filters
-	 * @param FilterInterface   $sorting
-	 * @param int               $pageIndex
-	 * @param int               $pageSize
+	 * @param QueryEffectInterface[] $filters
+	 * @param QueryEffectInterface   $sorting
+	 * @param int                    $pageIndex
+	 * @param int                    $pageSize
 	 * 
 	 * @return PagedQueryResult
 	 */
-	public function getFiltered($searchText, array $filters, FilterInterface $sorting, $pageIndex, $pageSize)
+	public function getFiltered(array $filters, QueryEffectInterface $sorting, $pageIndex, $pageSize)
 	{
-		$resultPreview = $this->getIdsFiltered($searchText, $filters, $sorting, $pageIndex, $pageSize);
+		$resultPreview = $this->getIdsFiltered($filters, $sorting, $pageIndex, $pageSize);
 		
 		$queryBuilder = $this->createQueryBuilder('track');
 		$expr = $queryBuilder->expr();
@@ -128,15 +127,14 @@ class TrackRepository
 	}
 	
 	/**
-	 * @param string            $searchText
-	 * @param FilterInterface[] $filters
-	 * @param FilterInterface   $sorting
-	 * @param int               $pageIndex
-	 * @param int               $pageSize
+	 * @param QueryEffectInterface[] $filters
+	 * @param QueryEffectInterface   $sorting
+	 * @param int                    $pageIndex
+	 * @param int                    $pageSize
 	 *
 	 * @return PagedQueryResult
 	 */
-	public function getIdsFiltered($searchText, array $filters, FilterInterface $sorting, $pageIndex, $pageSize)
+	public function getIdsFiltered(array $filters, QueryEffectInterface $sorting, $pageIndex, $pageSize)
 	{
 		$queryBuilder = $this->createQueryBuilder('track');
 		$expr = $queryBuilder->expr();
@@ -149,21 +147,6 @@ class TrackRepository
 			->from(Track::class, 'track');
 		
 		// Where
-		if ($searchText) {
-			$queryBuilder
-				->leftJoin('track.interprets', 'interpret')
-				->leftJoin('track.genres', 'genre')
-				->leftJoin('track.tags', 'tag')
-				->leftJoin('tag.type', 'tagType')
-				->andWhere(
-					$expr->orX(
-						$expr->like('track.title', '\'%' . $searchText . '%\''),
-						$expr->like('interpret.name', '\'%' . $searchText . '%\''),
-						$expr->like('genre.name', '\'%' . $searchText . '%\''),
-						$expr->like('tagType.name', '\'%' . $searchText . '%\'')
-					)
-				);
-		}
 		foreach ($filters as $filter) {
 			$filter->apply($queryBuilder);
 		}
