@@ -111,14 +111,14 @@ class TrackRepository
 		
 		$queryBuilder
 			->select('track')
-			->addSelect('interpret')
-			->addSelect('genre')
-			->addSelect('tag')
-			->addSelect('tagType')
 			->from(Track::class, 'track')
+			->addSelect('interpret')
 			->leftJoin('track.interprets', 'interpret')
+			->addSelect('genre')
 			->leftJoin('track.genres', 'genre')
+			->addSelect('tag')
 			->leftJoin('track.tags', 'tag')
+			->addSelect('tagType')
 			->leftJoin('tag.type', 'tagType')
 			->where($expr->in('track.id', $resultPreview->getItems()));
 		
@@ -144,22 +144,25 @@ class TrackRepository
 		
 		// Select From
 		$queryBuilder
-		->select('track.id')
-		->distinct()
-		->from(Track::class, 'track');
+			->select('track.id')
+			->distinct()
+			->from(Track::class, 'track');
 		
 		// Where
 		if ($searchText) {
-			$queryBuilder->leftJoin('track.interprets', 'interpret');
-			$queryBuilder->leftJoin('track.genres', 'genre');
-			$queryBuilder->leftJoin('track.tags', 'tag');
-			$queryBuilder->leftJoin('tag.type', 'tagType');
-			$queryBuilder->andWhere($expr->orX(
-				$expr->like('track.title', '\'%' . $searchText . '%\''),
-				$expr->like('interpret.name', '\'%' . $searchText . '%\''),
-				$expr->like('genre.name', '\'%' . $searchText . '%\''),
-				$expr->like('tagType.name', '\'%' . $searchText . '%\'')
-			));
+			$queryBuilder
+				->leftJoin('track.interprets', 'interpret')
+				->leftJoin('track.genres', 'genre')
+				->leftJoin('track.tags', 'tag')
+				->leftJoin('tag.type', 'tagType')
+				->andWhere(
+					$expr->orX(
+						$expr->like('track.title', '\'%' . $searchText . '%\''),
+						$expr->like('interpret.name', '\'%' . $searchText . '%\''),
+						$expr->like('genre.name', '\'%' . $searchText . '%\''),
+						$expr->like('tagType.name', '\'%' . $searchText . '%\'')
+					)
+				);
 		}
 		foreach ($filters as $filter) {
 			$filter->apply($queryBuilder);
