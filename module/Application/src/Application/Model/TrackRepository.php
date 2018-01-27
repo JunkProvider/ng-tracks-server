@@ -1,13 +1,14 @@
 <?php
-
 namespace Application\Model;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\AbstractQuery;
 
 class TrackRepository
 {
+
 	private static function mapSortCriterion($sortCriterion)
 	{
 		switch (strtoupper($sortCriterion)) {
@@ -19,7 +20,7 @@ class TrackRepository
 				throw new \InvalidArgumentException('Unknown sort criterion "' . $sortCriterion . '".');
 		}
 	}
-	
+
 	private static function mapSortDirection($sortDirection)
 	{
 		switch (strtoupper($sortDirection)) {
@@ -31,29 +32,33 @@ class TrackRepository
 				throw new \InvalidArgumentException('Unknown sort direction "' . $sortDirection . '".');
 		}
 	}
-	
+
 	/**
+	 *
 	 * @var EntityManager
 	 */
 	private $entityManager;
-	
+
 	/**
+	 *
 	 * @var EntityRepository
 	 */
 	private $doctrineRepository;
-	
+
 	/**
-	 * @param EntityManager    $entityManager
-	 * @param EntityRepository $doctrineRepository
+	 *
+	 * @param EntityManager $entityManager        	
+	 * @param EntityRepository $doctrineRepository        	
 	 */
 	public function __construct(EntityManager $entityManager, EntityRepository $doctrineRepository)
 	{
 		$this->entityManager = $entityManager;
 		$this->doctrineRepository = $doctrineRepository;
 	}
-	
+
 	/**
-	 * @param array $orderBy
+	 *
+	 * @param array $orderBy        	
 	 *
 	 * @return Track[]
 	 */
@@ -61,9 +66,10 @@ class TrackRepository
 	{
 		return $this->doctrineRepository->findBy([], $orderBy);
 	}
-	
+
 	/**
-	 * @param int $id
+	 *
+	 * @param int $id        	
 	 *
 	 * @return Track
 	 */
@@ -75,9 +81,10 @@ class TrackRepository
 		}
 		return $track;
 	}
-	
+
 	/**
-	 * @param int $id
+	 *
+	 * @param int $id        	
 	 *
 	 * @return Track|null
 	 */
@@ -89,83 +96,130 @@ class TrackRepository
 	/**
 	 * @param string            $searchText
 	 * @param FilterInterface[] $filters
-	 * @param array             $orderBy
+	 * @param FilterInterface   $sorting
+	 * @param int               $pageIndex
+	 * @param int               $pageSize
 	 * 
-	 * @throws \Exception
-	 * 
-	 * @return Track[]
+	 * @return PagedQueryResult
 	 */
-	public function getBySearchTextAndFilters($searchText, array $filters, FilterInterface $sorting, $offset = 0, $limit = null)
+	public function getFiltered($searchText, array $filters, FilterInterface $sorting, $pageIndex, $pageSize)
 	{
-		$qb = $this->createQueryBuilder('track');
-		$expr = $qb->expr();
+		$resultPreview = $this->getIdsFiltered($searchText, $filters, $sorting, $pageIndex, $pageSize);
 		
-		if ($searchText) {
-			$qb->join('track.interprets', 'interpret');
-			$qb->join('track.genres', 'genre');
-			$qb->join('track.tags', 'tag');
-			$qb->join('tag.type', 'tagType');
-			$qb->andWhere(
-				$expr->orX(
-					$expr->like('track.title', '\'%' . $searchText . '%\''),
-					$expr->like('interpret.name', '\'%' . $searchText . '%\''),
-					$expr->like('genre.name', '\'%' . $searchText . '%\''),
-					$expr->like('tagType.name', '\'%' . $searchText . '%\'')
-				)	
-			);
-		}
-	
-		foreach ($filters as $filter) {
-			$filter->apply($qb);
-		}
+		$queryBuilder = $this->createQueryBuilder('track');
+		$expr = $queryBuilder->expr();
 		
-		$sorting->apply($qb);
+		$queryBuilder
+			->select('track')
+			->addSelect('interpret')
+			->addSelect('genre')
+			->addSelect('tag')
+			->addSelect('tagType')
+			->from(Track::class, 'track')
+			->leftJoin('track.interprets', 'interpret')
+			->leftJoin('track.genres', 'genre')
+			->leftJoin('track.tags', 'tag')
+			->leftJoin('tag.type', 'tagType')
+			->where($expr->in('track.id', $resultPreview->getItems()));
 		
-		$qb->distinct(true);
-		
-		$query = $qb->getQuery();
-		
-		$paginator = new Paginator($query, $fetchJoinCollection = true);
-		$totalCount = $paginator->count();
-		
-		if ($offset !== null && $offset > 0) {
-			$query->setFirstResult($offset);
-		}
-		
-		if ($limit !== null) {
-			$query->setMaxResults($limit);
-		}
-		
-		return new PagedQueryResult($query->getResult(), $totalCount);
+		$query = $queryBuilder->getQuery();
+
+		return new PagedQueryResult($query->getResult(), $resultPreview->getPageIndex(), $resultPreview->getTotalCount());
 	}
 	
 	/**
-	 * @param Track $track
+	 * @param string            $searchText
+	 * @param FilterInterface[] $filters
+	 * @param FilterInterface   $sorting
+	 * @param int               $pageIndex
+	 * @param int               $pageSize
+	 *
+	 * @return PagedQueryResult
+	 */
+	public function getIdsFiltered($searchText, array $filters, FilterInterface $sorting, $pageIndex, $pageSize)
+	{
+		$queryBuilder = $this->createQueryBuilder('track');
+		$expr = $queryBuilder->expr();
+		
+		
+		// Select From
+		$queryBuilder
+		->select('track.id')
+		->distinct()
+		->from(Track::class, 'track');
+		
+		// Where
+		if ($searchText) {
+			$queryBuilder->leftJoin('track.interprets', 'interpret');
+			$queryBuilder->leftJoin('track.genres', 'genre');
+			$queryBuilder->leftJoin('track.tags', 'tag');
+			$queryBuilder->leftJoin('tag.type', 'tagType');
+			$queryBuilder->andWhere($expr->orX(
+				$expr->like('track.title', '\'%' . $searchText . '%\''),
+				$expr->like('interpret.name', '\'%' . $searchText . '%\''),
+				$expr->like('genre.name', '\'%' . $searchText . '%\''),
+				$expr->like('tagType.name', '\'%' . $searchText . '%\'')
+			));
+		}
+		foreach ($filters as $filter) {
+			$filter->apply($queryBuilder);
+		}
+		
+		// Order By
+		$sorting->apply($queryBuilder);
+		
+		
+		$query = $queryBuilder->getQuery();
+		
+		$results = $query->getResult();
+		$totalCount = count($results);
+		
+		if ($pageIndex * $pageSize >= $totalCount) {
+			$pageIndex = ceil($totalCount / $pageSize);
+		}
+		
+		$iStart = $pageIndex * $pageSize;
+		$iEnd = min([ ($pageIndex + 1) * $pageSize, $totalCount ]);
+		$ids = [];
+		for ($i = $iStart; $i < $iEnd; $i++) {
+			$ids[] = $results[$i]['id'];
+		}
+		
+		return new PagedQueryResult($ids, $pageIndex, $totalCount);
+	}
+
+	/**
+	 *
+	 * @param Track $track        	
 	 */
 	public function add(Track $track)
 	{
 		$this->entityManager->persist($track);
 	}
-	
+
 	/**
-	 * @param Track $track
+	 *
+	 * @param Track $track        	
 	 */
 	public function remove(Track $track)
 	{
 		$this->entityManager->remove($track);
 	}
-	
+
 	/**
-	 * @param string $alias
-	 * @param string $indexBy The index for the from.
 	 *
+	 * @param string $alias        	
+	 * @param string $indexBy
+	 *        	The index for the from.
+	 *        	
 	 * @return QueryBuilder
 	 */
 	private function createQueryBuilder($alias, $indexBy = null)
 	{
-		$doctrineQb = $this->doctrineRepository->createQueryBuilder($alias, $indexBy);
+		$doctrineQb = $this->doctrineRepository->createQueryBuilder($alias)->getEntityManager()->createQueryBuilder();
+		//$this->doctrineRepository->createQueryBuilder($alias, $indexBy);
 		$qb = QueryBuilder::extend($doctrineQb);
-		$qb->select($alias)->from($doctrineQb->getRootEntities()[0], $alias, $indexBy);
+		// $qb->select($alias)->from($doctrineQb->getRootEntities()[0], $alias, $indexBy);
 		return $qb;
 	}
 }

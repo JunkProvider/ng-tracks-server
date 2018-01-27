@@ -1,5 +1,4 @@
 <?php
-
 namespace Application\Model;
 
 use Doctrine\ORM\EntityManager;
@@ -7,27 +6,31 @@ use Doctrine\ORM\EntityRepository;
 
 class InterpretRepository
 {
+
 	/**
 	 */
 	private $entityManager;
-	
+
 	/**
+	 *
 	 * @var EntityRepository
 	 */
 	private $doctrineRepository;
-	
+
 	/**
-	 * @param EntityManager    $entityManager
-	 * @param EntityRepository $doctrineRepository
+	 *
+	 * @param EntityManager $entityManager        	
+	 * @param EntityRepository $doctrineRepository        	
 	 */
 	public function __construct(EntityManager $entityManager, EntityRepository $doctrineRepository)
 	{
 		$this->entityManager = $entityManager;
 		$this->doctrineRepository = $doctrineRepository;
 	}
-	
+
 	/**
-	 * @param array $orderBy
+	 *
+	 * @param array $orderBy        	
 	 *
 	 * @return Interpret[]
 	 */
@@ -35,9 +38,10 @@ class InterpretRepository
 	{
 		return $this->doctrineRepository->findBy([], $orderBy);
 	}
-	
+
 	/**
-	 * @param int $id
+	 *
+	 * @param int $id        	
 	 *
 	 * @return Interpret
 	 */
@@ -45,27 +49,32 @@ class InterpretRepository
 	{
 		return $this->doctrineRepository->find($id);
 	}
-	
+
 	/**
-	 * @param string $name
+	 *
+	 * @param string $name        	
 	 *
 	 * @return Interpret|null
 	 */
 	public function tryGetOneByName($name)
 	{
-		return $this->doctrineRepository->findOneBy([ 'name' => $name ]);
+		return $this->doctrineRepository->findOneBy([
+			'name' => $name
+		]);
 	}
-	
+
 	/**
-	 * @param Interpret $interpret
+	 *
+	 * @param Interpret $interpret        	
 	 */
 	public function add(Interpret $interpret)
 	{
 		$this->entityManager->persist($interpret);
 	}
-	
+
 	/**
-	 * @param Interpret $interpret
+	 *
+	 * @param Interpret $interpret        	
 	 */
 	public function remove(Interpret $interpret)
 	{

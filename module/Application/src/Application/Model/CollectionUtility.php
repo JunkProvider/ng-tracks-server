@@ -1,11 +1,11 @@
 <?php
-
 namespace Application\Model;
 
 use Doctrine\Common\Collections\Collection;
 
 class CollectionUtility
 {
+
 	public static function update(Collection $items, array $newItems)
 	{
 		$itemsToAdd = [];
@@ -17,10 +17,10 @@ class CollectionUtility
 				$itemsToAdd[$item->id] = $item;
 			}
 		}
-				
+		
 		foreach ($items as $index => $item) {
 			if (isset($itemsToAdd[$item->id])) {
-				unset ($itemsToAdd[$item->id]);
+				unset($itemsToAdd[$item->id]);
 			} else {
 				$items->remove($index);
 			}

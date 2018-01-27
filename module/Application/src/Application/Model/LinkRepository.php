@@ -1,5 +1,4 @@
 <?php
-
 namespace Application\Model;
 
 use Doctrine\ORM\EntityManager;
@@ -7,27 +6,31 @@ use Doctrine\ORM\EntityRepository;
 
 class LinkRepository
 {
+
 	/**
 	 */
 	private $entityManager;
-	
+
 	/**
+	 *
 	 * @var EntityRepository
 	 */
 	private $doctrineRepository;
-	
+
 	/**
-	 * @param EntityManager    $entityManager
-	 * @param EntityRepository $doctrineRepository
+	 *
+	 * @param EntityManager $entityManager        	
+	 * @param EntityRepository $doctrineRepository        	
 	 */
 	public function __construct(EntityManager $entityManager, EntityRepository $doctrineRepository)
 	{
 		$this->entityManager = $entityManager;
 		$this->doctrineRepository = $doctrineRepository;
 	}
-	
+
 	/**
-	 * @param array $orderBy
+	 *
+	 * @param array $orderBy        	
 	 *
 	 * @return Link[]
 	 */
@@ -35,9 +38,10 @@ class LinkRepository
 	{
 		return $this->doctrineRepository->findBy([], $orderBy);
 	}
-	
+
 	/**
-	 * @param int $id
+	 *
+	 * @param int $id        	
 	 *
 	 * @return Link
 	 */
@@ -45,27 +49,32 @@ class LinkRepository
 	{
 		return $this->doctrineRepository->find($id);
 	}
-	
+
 	/**
-	 * @param string $url
+	 *
+	 * @param string $url        	
 	 *
 	 * @return Link|null
 	 */
 	public function tryGetOneByUrl($url)
 	{
-		return $this->doctrineRepository->findOneBy([ 'url' => $url ]);
+		return $this->doctrineRepository->findOneBy([
+			'url' => $url
+		]);
 	}
-	
+
 	/**
-	 * @param Link $link
+	 *
+	 * @param Link $link        	
 	 */
 	public function add(Link $link)
 	{
 		$this->entityManager->persist($link);
 	}
-	
+
 	/**
-	 * @param Link $link
+	 *
+	 * @param Link $link        	
 	 */
 	public function remove(Link $link)
 	{

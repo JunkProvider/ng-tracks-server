@@ -1,5 +1,4 @@
 <?php
-
 namespace Application\Model\TrackFilter;
 
 use Application\Model\FilterInterface;
@@ -7,31 +6,37 @@ use Application\Model\QueryBuilder;
 
 class JoinedEntityTextFilter implements FilterInterface
 {
+
 	/**
+	 *
 	 * @var string
 	 */
 	private $join;
-	
+
 	/**
+	 *
 	 * @var string
 	 */
 	private $alias;
-	
+
 	/**
+	 *
 	 * @var string
 	 */
 	private $operator;
-	
+
 	/**
+	 *
 	 * @var string[]
 	 */
 	private $values;
-	
+
 	/**
-	 * @param string   $join
-	 * @param string   $alias
-	 * @param string   $operator
-	 * @param string[] $values
+	 *
+	 * @param string $join        	
+	 * @param string $alias        	
+	 * @param string $operator        	
+	 * @param string[] $values        	
 	 */
 	public function __construct($join, $alias, $operator, array $values)
 	{
@@ -40,9 +45,11 @@ class JoinedEntityTextFilter implements FilterInterface
 		$this->operator = $operator;
 		$this->values = $values;
 	}
-	
+
 	/**
+	 *
 	 * {@inheritDoc}
+	 *
 	 */
 	public function apply(QueryBuilder $qb)
 	{
@@ -50,7 +57,7 @@ class JoinedEntityTextFilter implements FilterInterface
 			return;
 		}
 		
-		$qb->leftJoin($qb->getRootAlias() . '.' . $this->join, $this->alias);
+		$qb->leftJoin('track.' . $this->join, $this->alias);
 		
 		$expr = $qb->expr();
 		
@@ -59,7 +66,10 @@ class JoinedEntityTextFilter implements FilterInterface
 			$value = trim($value);
 			$likeXs[] = $expr->like($this->alias . '.name', '\'%' . $value . '%\'');
 		}
-		$orX = call_user_func_array([$expr, 'orX'], $likeXs);
+		$orX = call_user_func_array([
+			$expr,
+			'orX'
+		], $likeXs);
 		$qb->andWhere($orX);
 	}
 }

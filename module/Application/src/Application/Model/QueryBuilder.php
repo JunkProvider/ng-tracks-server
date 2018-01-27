@@ -1,5 +1,4 @@
 <?php
-
 namespace Application\Model;
 
 use Doctrine\ORM\QueryBuilder as DoctrineQueryBuilder;
@@ -7,29 +6,35 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class QueryBuilder extends DoctrineQueryBuilder
 {
+
 	/**
+	 *
 	 * @var array
 	 */
 	private $joins = [];
-	
+
 	/**
-	 * @param DoctrineQueryBuilder $qb
+	 *
+	 * @param DoctrineQueryBuilder $qb        	
 	 */
 	public static function extend(DoctrineQueryBuilder $qb)
 	{
 		return new QueryBuilder($qb->getEntityManager());
 	}
-	
+
 	/**
-	 * @param EntityManagerInterface $em
+	 *
+	 * @param EntityManagerInterface $em        	
 	 */
 	public function __construct(EntityManagerInterface $em)
 	{
 		parent::__construct($em);
 	}
-	
+
 	/**
+	 *
 	 * {@inheritDoc}
+	 *
 	 */
 	public function innerJoin($join, $alias, $conditionType = null, $condition = null, $indexBy = null)
 	{
@@ -37,9 +42,11 @@ class QueryBuilder extends DoctrineQueryBuilder
 			return parent::innerJoin($join, $alias, $conditionType, $condition, $indexBy);
 		}
 	}
-	
+
 	/**
+	 *
 	 * {@inheritDoc}
+	 *
 	 */
 	public function leftJoin($join, $alias, $conditionType = null, $condition = null, $indexBy = null)
 	{
@@ -49,9 +56,10 @@ class QueryBuilder extends DoctrineQueryBuilder
 	}
 
 	/**
-	 * @param string $type
-	 * @param array  $args
-	 * 
+	 *
+	 * @param string $type        	
+	 * @param array $args        	
+	 *
 	 * @return bool
 	 */
 	private function registerJoin($type, array $args)
@@ -63,10 +71,11 @@ class QueryBuilder extends DoctrineQueryBuilder
 		$this->joins[] = $args;
 		return true;
 	}
-	
+
 	/**
-	 * @param array $args
-	 * 
+	 *
+	 * @param array $args        	
+	 *
 	 * @return bool
 	 */
 	private function containsJoin(array $args)
@@ -78,10 +87,11 @@ class QueryBuilder extends DoctrineQueryBuilder
 		}
 		return false;
 	}
-	
+
 	/**
-	 * @param array $args
-	 * @param array $join
+	 *
+	 * @param array $args        	
+	 * @param array $join        	
 	 *
 	 * @return bool
 	 */

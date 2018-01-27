@@ -80,10 +80,18 @@ class TrackController extends AbstractController
 					break;
 			}
 			
-			$offset = (int)$this->params()->fromQuery('offset', 0);
-			$limit = (int)$this->params()->fromQuery('limit', 1000);
+			$pageIndex = (int)$this->params()->fromQuery('pageIndex', 0);
+			$pageSize = (int)$this->params()->fromQuery('pageSize', 100);
 			
-			$result = $this->getTrackRepository()->getBySearchTextAndFilters($search, $filters, $sorting, $offset, $limit);
+			$result = $this->getTrackRepository()->getFiltered($search, $filters, $sorting, $pageIndex, $pageSize);
+			
+			/* @var Track $track */
+			/*$track = $result->getItems()[2];
+			var_dump($track->title);
+			var_dump($track->interprets->toArray());
+			var_dump($track->tags->toArray());
+			echo 'OKOK';
+			die();*/
 			
 			return $this->jsonResponse($result);
 		} catch (\Exception $e) {

@@ -1,5 +1,4 @@
 <?php
-
 namespace Application\Model\TrackFilter;
 
 use Application\Model\FilterInterface;
@@ -7,28 +6,34 @@ use Application\Model\QueryBuilder;
 
 class TagsFilter implements FilterInterface
 {
+
 	/**
+	 *
 	 * @var string
 	 */
 	private $operator;
-	
+
 	/**
+	 *
 	 * @var string[]
 	 */
 	private $values;
-	
+
 	/**
-	 * @param string $operator
-	 * @param array  $values
+	 *
+	 * @param string $operator        	
+	 * @param array $values        	
 	 */
 	public function __construct($operator, array $values)
 	{
 		$this->operator = $operator;
 		$this->values = $values;
 	}
-	
+
 	/**
+	 *
 	 * {@inheritDoc}
+	 *
 	 */
 	public function apply(QueryBuilder $qb)
 	{
@@ -36,7 +41,7 @@ class TagsFilter implements FilterInterface
 			return;
 		}
 		
-		$qb->leftJoin($qb->getRootAlias() . '.tags', 'tag');
+		$qb->leftJoin('track.tags', 'tag');
 		$qb->leftJoin('tag.type', 'tagType');
 		
 		$expr = $qb->expr();
@@ -47,7 +52,10 @@ class TagsFilter implements FilterInterface
 			$value = $item['value'];
 			$andXs[] = $expr->andX($expr->like('tagType.name', '\'%' . $name . '%\''), $expr->gte('tag.value', $value));
 		}
-		$orX = call_user_func_array([$expr, 'orX'], $andXs);
+		$orX = call_user_func_array([
+			$expr,
+			'orX'
+		], $andXs);
 		$qb->andWhere($orX);
 	}
 }

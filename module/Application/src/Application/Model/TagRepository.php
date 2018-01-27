@@ -1,5 +1,4 @@
 <?php
-
 namespace Application\Model;
 
 use Doctrine\ORM\EntityManager;
@@ -7,27 +6,31 @@ use Doctrine\ORM\EntityRepository;
 
 class TagRepository
 {
+
 	/**
 	 */
 	private $entityManager;
-	
+
 	/**
+	 *
 	 * @var EntityRepository
 	 */
 	private $doctrineRepository;
-	
+
 	/**
-	 * @param EntityManager    $entityManager
-	 * @param EntityRepository $doctrineRepository
+	 *
+	 * @param EntityManager $entityManager        	
+	 * @param EntityRepository $doctrineRepository        	
 	 */
 	public function __construct(EntityManager $entityManager, EntityRepository $doctrineRepository)
 	{
 		$this->entityManager = $entityManager;
 		$this->doctrineRepository = $doctrineRepository;
 	}
-	
+
 	/**
-	 * @param array $orderBy
+	 *
+	 * @param array $orderBy        	
 	 *
 	 * @return Tag[]
 	 */
@@ -35,9 +38,10 @@ class TagRepository
 	{
 		return $this->doctrineRepository->findBy([], $orderBy);
 	}
-	
+
 	/**
-	 * @param int $id
+	 *
+	 * @param int $id        	
 	 *
 	 * @return Tag
 	 */
@@ -45,27 +49,32 @@ class TagRepository
 	{
 		return $this->doctrineRepository->find($id);
 	}
-	
+
 	/**
-	 * @param string $name
+	 *
+	 * @param string $name        	
 	 *
 	 * @return Tag|null
 	 */
 	public function tryGetOneByName($name)
 	{
-		return $this->doctrineRepository->findOneBy([ 'name' => $name ]);
+		return $this->doctrineRepository->findOneBy([
+			'name' => $name
+		]);
 	}
-	
+
 	/**
-	 * @param Tag $tag
+	 *
+	 * @param Tag $tag        	
 	 */
 	public function add(Tag $tag)
 	{
 		$this->entityManager->persist($tag);
 	}
-	
+
 	/**
-	 * @param Tag $tag
+	 *
+	 * @param Tag $tag        	
 	 */
 	public function remove(Tag $tag)
 	{
